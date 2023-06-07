@@ -53,6 +53,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/PciEnumerationComplete.h>
 
 ///
+/// For boot order override.
+///
+#define IPMI_BOOT_OVERRIDE_VAR_NAME L"IpmiBootOverride"
+#define IS_FIRST_BOOT_VAR_NAME L"IsFirstBoot"
+
+///
 /// ConnectType
 ///
 #define CONSOLE_OUT 0x00000001
@@ -208,4 +214,15 @@ RegisterDefaultBootOption (
   VOID
   );
 
+/**
+  Add console variable device paths
+
+  @param ConsoleType         ConIn or ConOut
+  @param ConsoleDevicePath   Device path to be added
+**/
+VOID
+AddConsoleVariable (
+  IN CONSOLE_TYPE              ConsoleType,
+  IN EFI_DEVICE_PATH           *ConsoleDevicePath
+  );
 #endif

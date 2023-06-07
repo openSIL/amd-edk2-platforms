@@ -1,0 +1,32 @@
+## @file
+#
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = PspRomArmorWhitelistLib
+  FILE_GUID                      = B6F8507A-C96B-4036-A8C0-26BAD6AC5F34
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformPspRomArmorWhitelistLib
+
+[Sources]
+  PspRomArmorWhitelistLib.c
+
+[Packages]
+  AgesaModulePkg/AgesaCommonModulePkg.dec
+  AgesaPkg/AgesaPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  PcdLib
+  DebugLib
+
+[Depex]
+  TRUE

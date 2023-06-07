@@ -1,0 +1,37 @@
+## @file
+#
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiTscTimerLib
+  FILE_GUID                      = 342C36C0-15DF-43b4-9EC9-FBF748BFB3D1
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib|PEIM PEI_CORE
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  TscTimerLibShare.c
+  PeiTscTimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  AgesaModulePkg/AgesaCommonModulePkg.dec
+  AgesaModulePkg/AgesaModuleCcxPkg.dec
+  AgesaPkg/AgesaPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  BaseLib
+  HobLib
+
+[Guids]
+

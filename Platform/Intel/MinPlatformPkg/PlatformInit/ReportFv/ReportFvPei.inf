@@ -20,6 +20,7 @@
   PeiServicesLib
   ReportFvLib
   TestPointCheckLib
+  IoLib
 
 [Packages]
   MdePkg/MdePkg.dec

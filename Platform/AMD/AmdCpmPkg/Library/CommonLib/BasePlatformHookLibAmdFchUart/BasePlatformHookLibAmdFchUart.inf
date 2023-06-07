@@ -1,0 +1,34 @@
+## @file
+#
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BasePlatformHookLibAmdFchUart
+  FILE_GUID                      = BF2F3F3F-4BE6-4B97-850D-D5D4941D391C
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformHookLib
+
+[Sources]
+  BasePlatformHookLibAmdFchUart.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  AmdCpmPkg/AmdCpmPkg.dec
+  AgesaModulePkg/AgesaModuleFchPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  IoLib
+  PlatformHookLib
+
+[FixedPcd]
+
+

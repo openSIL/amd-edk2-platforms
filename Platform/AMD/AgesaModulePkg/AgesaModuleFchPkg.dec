@@ -1,0 +1,41 @@
+## @file
+#
+#  AMD Generic Encapsulated Software Architecture (AGESA) FCH Module Package DEC
+#  file.
+#  This file provides the minimum FCH package definitions for building AMD
+#  edk2 modules.
+#  
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION     = 1.5
+  PACKAGE_NAME          = AgesaFchPkg
+  PACKAGE_GUID          = e47c8ed9-3000-4e6e-b1c6-875b365b3849
+  PACKAGE_VERSION       = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+[Guids]
+  gEfiAmdAgesaModulePkgTokenSpaceGuid = { 0x7788adf0, 0x9788, 0x4a3f, { 0x83, 0xfa, 0xcb, 0x51, 0x2e, 0x7c, 0xf8, 0xdd } }
+
+[Protocols]
+[Ppis]
+[PcdsFeatureFlag]
+[PcdsFixedAtBuild]
+[PcdsDynamic]
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdLegacyFree|FALSE|BOOLEAN|0x0003F001
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdHpetEnable|TRUE|BOOLEAN|0x0003F002
+
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdHpetMsiDis|TRUE|BOOLEAN|0x0003F003
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdResetMode|0x00|UINT8|0x0003F00D
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdNoneSioKbcSupport|FALSE|BOOLEAN|0x0003F021
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdLpcEnable|TRUE|BOOLEAN|0x0003F400
+
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdXhciSsid|0x00000000|UINT32|0x0003FF07
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.FchRTDeviceEnableMap|0x00000000|UINT32|0x0003FF81

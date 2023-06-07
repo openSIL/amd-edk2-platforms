@@ -1,0 +1,45 @@
+## @file
+#
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = AmdPspFlashAccLibSmm
+  FILE_GUID                      = 3BBDC3A5-A0E2-4E8A-8240-9E594920F040
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = AmdPspFlashAccLib | DXE_SMM_DRIVER 
+
+[Sources.common]
+  AmdPspFlashAccSpiNorLibSmm.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  AgesaModulePkg/AgesaCommonModulePkg.dec
+  AgesaModulePkg/AgesaModulePspPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  AgesaPkg/AgesaPkg.dec
+
+[LibraryClasses]
+  AmdPspBaseLibV2
+  BaseLib
+  DebugLib
+  SmmServicesTableLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiSmmBase2ProtocolGuid
+  gEfiSpiSmmNorFlashProtocolGuid
+
+[Pcd]
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAgesaFlashNvStorageBlockSize  ## CONSUMES
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAgesaFlashAreaBaseAddress     ## CONSUMES
+
+[Depex]
+  gEfiSmmBase2ProtocolGuid AND
+  gEfiSpiSmmNorFlashProtocolGuid
+

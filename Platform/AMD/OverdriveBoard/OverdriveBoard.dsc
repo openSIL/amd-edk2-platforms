@@ -408,9 +408,6 @@ DEFINE X64EMU_ENABLE  = FALSE
   gArmTokenSpaceGuid.PcdPciMmio64Size|0x7F00000000
   gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation|0x0
 
-  ## Use PCI emulation for ATA PassThru
-  # gEfiMdeModulePkgTokenSpaceGuid.PcdAtaPassThruPciEmulation|TRUE
-
   ## ACPI (no tables < 4GB)
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x20
 

@@ -35,6 +35,9 @@
   PerformanceLib
   TimerLib
   Tcg2PhysicalPresenceLib
+  IpmiLib
+  IpmiCommandLib
+
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,6 +45,7 @@
   SecurityPkg/SecurityPkg.dec
   MinPlatformPkg/MinPlatformPkg.dec
   BoardModulePkg/BoardModulePkg.dec
+  ManageabilityPkg/ManageabilityPkg.dec
 
 [Pcd]
   gMinPlatformPkgTokenSpaceGuid.PcdTpm2Enable                       ## CONSUMES

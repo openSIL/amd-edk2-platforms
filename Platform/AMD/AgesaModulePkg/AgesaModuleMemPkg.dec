@@ -1,0 +1,33 @@
+## @file
+#
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION     = 0x00010005
+  PACKAGE_NAME          = AgesaMemPkg
+  PACKAGE_GUID          = 445f7303-3171-428c-ad0b-32df4474a7ad
+  PACKAGE_VERSION       = 0.1
+
+[Includes]
+  Include/
+
+[LibraryClasses]
+
+[Guids]
+
+[Protocols]
+
+[Ppis]
+
+[PcdsFeatureFlag]
+
+[PcdsFixedAtBuild]
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdAmdMemCfgMaxPostPackageRepairEntries|64|UINT32|0x00029001
+
+[PcdsDynamic]
+
+

@@ -4,7 +4,6 @@
 #  Description file for AMD AmdMinBoardPkg
 #
 #  Copyright (c) 2023, Advanced Micro Devices, Inc. All rights reserved.
-#  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
 [Defines]
@@ -25,6 +24,7 @@
 [LibraryClasses]
   SpcrDeviceLib|AmdMinBoardPkg/Library/SpcrDeviceLib/SpcrDeviceLib.inf
   ReportFvLib|AmdMinBoardPkg/Library/PeiReportFvLib/PeiReportFvLib.inf
+  PlatformSecLib|AmdMinBoardPkg/Library/PlatformSecLib/PlatformSecLib.inf
 
 [LibraryClasses.common]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -35,16 +35,43 @@
   RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  BoardAcpiTableLib|MinPlatformPkg/Acpi/Library/BoardAcpiTableLibNull/BoardAcpiTableLibNull.inf
 
 [LibraryClasses.common.PEIM]
   SetCacheMtrrLib|AmdMinBoardPkg/Library/SetCacheMtrrLib/SetCacheMtrrLib.inf
+  BoardInitLib|AmdMinBoardPkg/Library/PeiBoardInitPreMemLib/PeiBoardInitPreMemLib.inf
+
+[LibraryClasses.common.DXE_DRIVER]
+  BoardInitLib|AmdMinBoardPkg/Library/DxeBoardInitLib/DxeBoardInitLib.inf
 
 [Components]
   AmdMinBoardPkg/Library/SpcrDeviceLib/SpcrDeviceLib.inf
 
+[Components.IA32, Components.X64]
+  AmdMinBoardPkg/Library/PlatformSecLib/PlatformSecLib.inf
+
 [Components.IA32]
   AmdMinBoardPkg/Library/SetCacheMtrrLib/SetCacheMtrrLib.inf
   AmdMinBoardPkg/Library/PeiReportFvLib/PeiReportFvLib.inf
+  AmdMinBoardPkg/Library/PeiBoardInitPreMemLib/PeiBoardInitPreMemLib.inf
 
 [Components.X64]
   AmdMinBoardPkg/PciHotPlug/PciHotPlugInit.inf
+  AmdMinBoardPkg/Library/DxeBoardInitLib/DxeBoardInitLib.inf
+
+# to make PcdSet64S working
+[PcdsDynamicDefault]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|0x10000000
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS     = -D DISABLE_NEW_DEPRECATED_INTERFACES
+  INTEL:*_*_*_CC_FLAGS   = /D DISABLE_NEW_DEPRECATED_INTERFACES
+  MSFT:*_*_*_CC_FLAGS    = /D DISABLE_NEW_DEPRECATED_INTERFACES
+
+  GCC:*_*_*_CC_FLAGS     = -D USE_EDKII_HEADER_FILE
+
+  # Turn off DEBUG messages for Release Builds
+  GCC:RELEASE_*_*_CC_FLAGS     = -D MDEPKG_NDEBUG
+  INTEL:RELEASE_*_*_CC_FLAGS   = /D MDEPKG_NDEBUG
+  MSFT:RELEASE_*_*_CC_FLAGS    = /D MDEPKG_NDEBUG
+

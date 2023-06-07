@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeiServicesLib.h>
 #include <Library/ReportFvLib.h>
 #include <Library/TestPointCheckLib.h>
+#include <Library/IoLib.h>
 
 EFI_STATUS
 EFIAPI

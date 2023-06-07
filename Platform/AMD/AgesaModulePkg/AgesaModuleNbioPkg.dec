@@ -1,0 +1,39 @@
+## @file
+#
+#  AMD Generic Encapsulated Software Architecture (AGESA) NBIO Module Package DEC
+#  file.
+#  This file provides the minimum AMD NBIO package definitions for building AMD
+#  edk2 modules.
+#  
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION     = 0x00010005
+  PACKAGE_NAME          = AgesaNbioPkg
+  PACKAGE_GUID          = 1486f0fe-39ee-4856-a39f-222ff2404f26
+  PACKAGE_VERSION       = 0.1
+
+[Includes]
+  Include
+
+[Guids]
+[Protocols]
+  gAmdNbioPcieServicesProtocolGuid          = {0x756db75c, 0xbb9d, 0x4289, {0x81, 0x3a, 0xdf, 0x21, 0x5,  0xc4, 0xf8, 0xe}}
+[Ppis]
+
+[PcdsFeatureFlag]
+
+[PcdsFixedAtBuild]
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdCfgIommuMMIOAddressReservedEnable|FALSE|BOOLEAN|0x00021100 #///< 1: Enable Iommu MMIO reserved from GNB driver. 0:Disable
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdCfgIoApicMMIOAddressReservedEnable|FALSE|BOOLEAN|0x00021101 #///< 1: Enable Ioapic MMIO reserved from GNB driver. 0:Disable
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdCfgIoApicIdPreDefineEn|FALSE|BOOLEAN|0x00021102            #///< TRUE: Enable assign IOAPIC ID at PEI phase
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdCfgIoApicIdBase|0xF1|UINT8|0x00021103                      #///< Base NBIO IOAPIC ID. ID assigned start from this value
+
+[PcdsDynamic]
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdCfgGnbIoapicId|0|UINT8|0x0004101D
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdCfgFchIoapicId|0|UINT8|0x0004101E
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdSmuFeatureControlDefinesExt|0x0|UINT32|0x00041200

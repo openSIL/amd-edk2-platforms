@@ -1,0 +1,42 @@
+## @file
+#
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AmdApcbPeiV3
+  FILE_GUID                      = E1B8CF4A-FE7B-4676-B4F7-50C7228282A4
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = AmdApcbV3PeiDriverEntry
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  AgesaPkg/AgesaPkg.dec
+  AgesaModulePkg/AgesaCommonModulePkg.dec
+  AgesaModulePkg/AgesaModulePspPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PeimEntryPoint
+  ApcbLibV3Pei
+
+[sources]
+  ApcbV3Pei.c
+
+[Guids]
+
+
+[Ppis]
+
+[Pcd]
+
+[Depex]
+  TRUE
+

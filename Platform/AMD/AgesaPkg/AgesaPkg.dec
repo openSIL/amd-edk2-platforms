@@ -1,0 +1,360 @@
+## @file
+#
+#  AMD Generic Encapsulated Software Architecture (AGESA) Package DEC
+#  file.
+#  
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  DEC_SPECIFICATION     = 0x00010005
+  PACKAGE_NAME          = AgesaPkg
+  PACKAGE_GUID          = DABFEFC6-5A79-444b-862A-1F6FE9F561FE
+  PACKAGE_VERSION       = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+[Guids]
+  gEfiAmdAgesaPkgTokenSpaceGuid = { 0xd4d8435f, 0xfffb, 0x4acb, { 0xa0, 0x4d, 0xff, 0x0f, 0xad, 0x67, 0x7f, 0xe9 } }
+
+[Protocols]
+  gAmdNbioCxlServicesProtocolGuid        = {0x125CCFCE, 0x34AF, 0x422C, {0xB3, 0xB3, 0x71, 0x23, 0xA3, 0x1E, 0xC8, 0x61}}
+  gAmdPciResourceProtocolGuid            = {0x663d4897, 0xed94, 0x4f0f, {0x86, 0x64, 0xfe, 0xdc, 0x70, 0x30, 0x7f, 0x19}}
+[PcdsFeatureFlag]
+[PcdsFixedAtBuild]
+
+  ### @brief Enable EDK-II Protocols
+  ### @details This item enables support for EDKII implementation of ACPI Protocols when set to TRUE
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdCompliantEdkIIAcpiSdtProtocol|TRUE|BOOLEAN|0x00020006
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAgesaFlashNvStorageBlockSize |0x1000|UINT32|0x00020007
+
+  ### @brief assign non volatile storage base address
+  ### @details This assigns the base address to map to flash deivce.
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAgesaFlashAreaBaseAddress|0xFF000000|UINT32|0x00020017
+
+#----------------------------------------------------------------------------
+#-  FCH Fixed PCDs
+#-
+### Set Doxy_path: "PCD-FCH.h"
+#----------------------------------------------------------------------------
+
+  ### @name General FCH Controls
+
+  ### @brief Allows the host BIOS to specify the IO address for the ACPI PM1 register blocks as defined by ACPI spec.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0x0400)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdFchCfgAcpiPm1EvtBlkAddr|0x400|UINT16|0x0002F004
+
+  ### @brief  Allows the host BIOS to specify the IO address for the ACPI PM1Cnt register blocks as defined by ACPI spec.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0x0404)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdFchCfgAcpiPm1CntBlkAddr|0x404|UINT16|0x0002F005
+
+  ### @brief Allows the host BIOS to specify the IO address for the ACPI PM Timer as defined by ACPI spec.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0x0408)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdFchCfgAcpiPmTmrBlkAddr|0x408|UINT16|0x0002F006
+
+  ### @brief Allows the host BIOS to specify the IO address for the ACPI CPU Control block as defined by ACPI spec.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0x0410)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdFchCfgCpuControlBlkAddr|0x410|UINT16|0x0002F007
+
+  ### @brief Allows the host BIOS to specify the IO address for the ACPI GPE0 register block as defined by ACPI spec.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0x0420)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdFchCfgAcpiGpe0BlkAddr|0x420|UINT16|0x0002F008
+
+  ### @brief This item defines the SMI command value sent by the host BIOS during the S3 resume sequence, to re-initialize the
+  ### FCH registers. This must be issued before the platform driver restore function is started.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0xD3)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchOemBeforePciRestoreSwSmi|0xD3|UINT8|0x0002F010
+
+  ### @brief This item defines the SMI command used by the host BIOS to signal the FCH driver that the platform driver has
+  ### completed its restore function. This allows the FCH driver to perform some final FCH settings.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0xD4)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchOemAfterPciRestoreSwSmi|0xD4|UINT8|0x0002F011
+
+  ### @brief Allows the host BIOS to set the SMI command value used by the OS to activate ACPI mode.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0xA0)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchOemEnableAcpiSwSmi|0xA0|UINT8|0x0002F012
+
+  ### @brief Allows the host BIOS to set the SMI command value used by the OS to turn off ACPI mode.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0xA1)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchOemDisableAcpiSwSmi|0xA1|UINT8|0x0002F013
+
+  ### @brief SMI command used for releasing the SPI controller lock mode. All devices on the SPI bus will be writable.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0xAA)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchOemSpiUnlockSwSmi|0xAA|UINT8|0x0002F014
+
+  ### @brief SMI command for setting the lock mode in the SPI controller. This will effectively provide a write protection to the
+  ### SPI Flash ROM; however, write access to secondary SPI devices will also be blocked.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0xAB)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchOemSpiLockSwSmi|0xAB|UINT8|0x0002F015
+#----------------------------------------------------------------------------
+#-  FCH Fixed PCDs
+#-
+### Set Doxy_path: "PCD-FCH-IRQ.h"
+#----------------------------------------------------------------------------
+
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchUart0Irq|0x03|UINT8|0x0002F01A
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchUart1Irq|0x0E|UINT8|0x0002F01B
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchUart2Irq|0x05|UINT8|0x0002F01C
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchUart3Irq|0x0F|UINT8|0x0002F01D
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchUart4Irq|0x10|UINT8|0x0002F01E
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchI2c0Irq|0x0A|UINT8|0x0002F01F
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchI2c1Irq|0x0B|UINT8|0x0002F020
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchI2c2Irq|0x04|UINT8|0x0002F021
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchI2c3Irq|0x06|UINT8|0x0002F022
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchI2c4Irq|0x16|UINT8|0x0002F023
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdFchI2c5Irq|0x17|UINT8|0x0002F024
+#-  DF Fixed PCDs
+#-
+### Set Doxy_path: "PCD-DF.h"
+#----------------------------------------------------------------------------
+
+  #Fabric
+
+  ### @name General DF Controls
+
+  ### @brief This item informs the SMBios generation code as to how many physical processor sockets exist in the system and
+  ### therefore how many Type 4 SMBios records to produce.
+  ### @brief Permitted Choices: (Type: Value)(Default: 0x01)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdNumberOfPhysicalSocket|1|UINT8|0x000CC103
+#----------------------------------------------------------------------------
+#-  CCX Fixed PCDs
+#-
+### Set Doxy_path: "PCD-CCX-MTRR.h"
+#----------------------------------------------------------------------------
+
+
+  ### @brief The base address of temporary page table for accessing PCIE MMIO base address above 4G in PEI phase.
+  ### @brief Permitted Choices: 0x0 - 0xFFFFFFFF (Type: Value)(Default: 0)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdPeiTempPageTableBaseAddress|0|UINT32|0x000CC11B
+
+#----------------------------------------------------------------------------
+#-  CCX ACPI Fixed PCDs
+#-
+### Set Doxy_path: "PCD-CCX-ACPI.h"
+#----------------------------------------------------------------------------
+  #ACPI
+  #  Cpu SSDT
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdAcpiCpuSsdtProcessorScopeName0|0x43|UINT8|0x000AC001
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdAcpiCpuSsdtProcessorScopeName1|0x30|UINT8|0x000AC002
+  ### @brief This element specifies whether the ACPI _PSS objects are defined in the system bus or processor scope.
+  ### @brief Permitted Choices: (Type: Boolean)(Default: FALSE)
+  ### @li TRUE - The objects will be under the \_SB scope.
+  ### @li FALSE - The objects will be under the \_PR scope
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdAcpiCpuSsdtProcessorScopeInSb|FALSE|BOOLEAN|0x000AC003
+
+  ### @brief Set the OEM ID field in ACPI table outputs to this string. The string must conform to the ACPI rules for the OEM ID field.
+  ### @brief Permitted Choices: (Type: Value)(Default: "AMD")
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdAcpiTableHeaderOemId|"AMD"|VOID*|0x000AC004
+
+#----------------------------------------------------------------------------
+#-  CCX SMBIOS Fixed PCDs
+#-
+### Set Doxy_path: "PCD-CCX-SMBIOS.h"
+#----------------------------------------------------------------------------
+
+  ### @name CCX SMBIOS Controls
+
+  ### @brief When creating the SMBios table entry, use this as the label for the processor socket. This should match the
+  ### silkscreen label on the motherboard.
+  ### @brief Permitted Choices: (Type: Value)(Default: "Unknown")
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdSmbiosSocketDesignationSocket0|"Unknown"|VOID*|0x00001001
+
+  ### @brief When creating the SMBios table entry, use this as the value for the 'serial number' field for each processor.
+  ### @brief Permitted Choices: (Type: Value)(Default: "Unknown")
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdSmbiosSerialNumberSocket0|"Unknown"|VOID*|0x00001002
+
+
+  ### @brief When creating the SMBios table entry, use this as the value for the 'Asset Tag' field for each processor.
+  ### @brief Permitted Choices: (Type: Value)(Default: "Unknown")
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdSmbiosAssetTagSocket0|"Unknown"|VOID*|0x00001003
+
+  ### @brief When creating the SMBios table entry, use this as the value for the 'Part Number' field for each processor.
+  ### @brief Permitted Choices: (Type: Value)(Default: "Unknown")
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdSmbiosPartNumberSocket0|"Unknown"|VOID*|0x00001004
+
+  ### @brief SMBios socket 1 Label.
+  ### @details When creating the SMBios table entry, use this as the label for the
+  ### processor socket. This should match the silkscreen label on the motherboard.
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdSmbiosSocketDesignationSocket1|"Unknown"|VOID*|0x00001005
+
+  ### @brief SMBIOS socket 1 Serial Number.
+  ### @details When creating the SMBios table entry, use this as the value for
+  ### the 'serial number' field for the processor in socket 1.
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdSmbiosSerialNumberSocket1|"Unknown"|VOID*|0x00001006
+
+  ### @brief SMBios socket 1 Asset Tag.
+  ### @details When creating the SMBios table entry, use this as the value for
+  ### the 'Asset Tag' field for the processor in socket 1.
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdSmbiosAssetTagSocket1|"Unknown"|VOID*|0x00001007
+
+  ### @brief Socket 1 Part Number.
+  ### @details When creating the SMBios table entry, use this as the value for
+  ### the 'Part Number' field for the processor in socket 1.
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdSmbiosPartNumberSocket1|"Unknown"|VOID*|0x00001008
+
+#----------------------------------------------------------------------------
+#-  ACPI Fixed PCDs
+#-
+### Set Doxy_path: "PCD-ACPI.h"
+#----------------------------------------------------------------------------
+
+  ### @name General ACPI Controls
+
+  ### @brief PCD supporting maximum capacity for Type 16 table
+  ### @details This PCD represents maximum memory capacity in KB
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdSmbiosT16MaximumCapacity|0x04000000|UINT32|0x00001009   # 4G   - 0x00400000
+                                                                                              # 8G   - 0x00800000
+                                                                                              # 16G  - 0x01000000
+                                                                                              # 32G  - 0x02000000
+                                                                                              # 64G  - 0x04000000
+                                                                                              # 128G - 0x08000000
+                                                                                              # 256G - 0x10000000
+                                                                                              # 512G - 0x20000000
+[PcdsDynamic]
+#----------------------------------------------------------------------------
+#    System level Dynamic PCDs
+### Set Doxy_path: "PCD-Sys.h"
+#----------------------------------------------------------------------------
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdCStateIoBaseAddress|0x413|UINT16|0x000CC002
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdAcpiCpuSsdt|TRUE|BOOLEAN|0x000CC00B
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdApicMode|0xFF|UINT8|0x000CC01D
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdCpuWdtEn|TRUE|BOOLEAN|0x000CC200
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdAcpiCpuSsdtProcessorContainerInSb|FALSE|BOOLEAN|0x000CC50B
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdAcpiCpuSsdtProcessorContainerName|"PLTF"|VOID*|0x000CC50C
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdSmbiosT4CpuMaxSpeed|0|UINT16|0x000CC900
+#----------------------------------------------------------------------------
+#-  DF Dynamic PCDs
+### Set Doxy_path: "PCD-DF.h"
+#----------------------------------------------------------------------------
+
+
+  ### @cond (BRH)
+  ### @brief Specifies the top address to be used for MMIO space allocations. No MMIO space will be used above this limit. Some devices have limits on the address space they
+  ### are able to access. For example a device with a 40-bit address limitation can not use MMIO space above 1TeraByte (1T). By setting this PCD to 0x10000000000 (1T), MMIO
+  ### space would not be allocated above 1T. The default is to use all of the space above the end of physical memory.
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdMmioAbove4GLimit|0xFFFFFFFFFFFFFFFF|UINT64|0x0003FFC2
+  ### @endcond
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdFabricResourceDefaultSizePtr|0|UINT64|0x00DF0000
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdFchCfgSmiCmdPortAddr|0xB0|UINT16|0x0003FFC0
+
+#----------------------------------------------------------------------------
+#-  FCH Dynamic PCDs
+### Set Doxy_path: "PCD-FCH-UART.h"
+#----------------------------------------------------------------------------
+  ### @name UART Legacy IO Assignments
+  ### @{
+  ### @brief These controls allow the platform to specify the legacy IO ranges that are to be used by the UART ports in the processor. Permitted Choices: (Type: value)(Default: Disabled)
+  ### @li  0 - Disabled
+  ### @li  1 - IO range 0x02E8 - 0x02EF
+  ### @li  2 - IO range 0x02F8 - 0x02FF
+  ### @li  3 - IO range 0x03E8 - 0x03EF
+  ### @li  4 - IO range 0x03F8 - 0x03FF
+
+
+  gEfiAmdAgesaPkgTokenSpaceGuid.FchUart0LegacyEnable|0x00|UINT8|0x000FC010
+  gEfiAmdAgesaPkgTokenSpaceGuid.FchUart1LegacyEnable|0x00|UINT8|0x000FC011
+  gEfiAmdAgesaPkgTokenSpaceGuid.FchUart2LegacyEnable|0x00|UINT8|0x000FC012
+  gEfiAmdAgesaPkgTokenSpaceGuid.FchUart3LegacyEnable|0x00|UINT8|0x000FC013
+  ### @} end UART Legacy IO assignments
+
+#----------------------------------------------------------------------------
+#-  FCH Dynamic PCDs
+### Set Doxy_path: "PCD-FCH-USB.h"
+#----------------------------------------------------------------------------
+
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdXhci0Enable|TRUE|BOOLEAN|0x000FC020
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdXhci1Enable|TRUE|BOOLEAN|0x000FC021
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdXhci2Enable|TRUE|BOOLEAN|0x000FC022
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdXhci3Enable|TRUE|BOOLEAN|0x000FC023
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdSataEnable|TRUE|BOOLEAN|0x000FC030
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdSataStaggeredSpinup|FALSE|BOOLEAN|0x000FC039
+
+#----------------------------------------------------------------------------
+#-  NBIO Dynamic PCDs
+### Set Doxy_path: "PCD-NBIO-BMC.h"
+#----------------------------------------------------------------------------
+
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdEarlyBmcLinkTraining|FALSE|BOOLEAN|0x0004F004
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdEarlyBmcLinkSocket|0xFF|UINT8|0x0004F005
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdEarlyBmcLinkDie|0xFF|UINT8|0x0004F006
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdEarlyBmcLinkLaneNum|0|UINT8|0x0004F03E
+
+#----------------------------------------------------------------------------
+#-  NBIO Dynamic PCDs
+### Set Doxy_path: "PCD-NBIO.h"
+#----------------------------------------------------------------------------
+
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdCfgIommuSupport|TRUE|BOOLEAN|0x0004F027
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdIvInfoDmaReMap|FALSE|BOOLEAN|0x0004F028
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdTelemetry_VddcrVddfull_Scale_Current|0x00|UINT32|0x0004F0A0
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdTelemetry_VddcrSocfull_Scale_Current|0x00|UINT32|0x0004F0A2
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdEgressPoisonSeverityLo|0x4|UINT32|0x0004F210
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdEgressPoisonSeverityHi|0x30011|UINT32|0x0004F211
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdCxlProtocolErrorReporting|0|UINT8|0x0004F362
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdCxlComponentErrorReporting|0|UINT8|0x0004F363
+
+#----------------------------------------------------------------------------
+#-  PSP Dynamic PCDs
+### Set Doxy_path: "PCD-PSP.h"
+#----------------------------------------------------------------------------
+  ### PSP PCDs DYNAMIC
+
+  ### @brief This feature selects the APCB recovery support on x86 side. If or when an instance of a writable APCB is determined to be invalid, the PSP driver will
+  ### attempt a 'recovery' by copying the recovery instance of the APCB (default values as indicated in the APCB descriptor files). Upon boot up, the ABL reads CMOS
+  ### bytes 06/07 at index/data port of 0x72/0x73. If the CMOS flag reads anything else other than 0xA55A or 0x5555, the system boots in APCB recovery mode, in which
+  ### ABL consumes the recovery instances of APCB. Otherwise it boots in normal/non-recovery mode.
+  ### @brief Permitted Choices: (Type: Boolean)(Default: TRUE)
+  ### @brief This feature is affected by the platform CMOS power design. Please see Platform CMOS power .
+  ### @li TRUE - the AGESA PSP driver restores the APCB instances from the recovery instance, writes 0xA55A to the CMOS location and triggers a reset . The next time
+  ### the system powers up, ABL runs in normal/non-recovery mode.
+  ### @li FALSE - the AGESA PSP driver writes 0x5555 to the CMOS location without restoring the APCB instances or triggering a reset. In this mode the additional reset
+  ### is avoided at the potential risk of the writeable APCB instance being left corrupted forever.
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdPspApcbRecoveryEnable|TRUE|BOOLEAN|0x95940008
+
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdPspAntiRollbackLateSplFuse|FALSE|BOOLEAN|0x95940018
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdMemBootTimePostPackageRepair|TRUE|BOOLEAN|0x00030005
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdMemRuntimePostPackageRepair|FALSE|BOOLEAN|0x00030006
+[PcdsFixedAtBuild, PcdsDynamic]
+#----------------------------------------------------------------------------
+#-  System control PCDs
+### Set Doxy_path: "PCD-Sys.h"
+#----------------------------------------------------------------------------
+  ### @brief Switch for Debug Print function
+  ### @details Switch for Debug Print function to enable or not.
+  ### @li TRUE:  Enable IdsDebugPrint output
+  ### @li FALSE: Disable IdsDebugPrint output
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdIdsDebugPrintEnable|FALSE|BOOLEAN|0x00020004
+  ### @brief Specify the filter for IdsDebugPrint
+  ### @details When the filter values are matched, the AmdIdsDebugPrint can start to print debug message.
+  ### Refer Library/IdsLib.h for details, and the Master token is PcdAmdIdsDebugPrintEnable.
+  ### @li 0x100401008A30042C: (GNB_TRACE | PCIE_MISC | NB_MISC | GFX_MISC  | CPU_TRACE | MEM_FLOW | MEM_STATUS | MEM_PMU | FCH_TRACE | MAIN_FLOW| TEST_POINT | PSP_TRACE)
+  ### @li 0x100401008A300408: (GNB_TRACE | PCIE_MISC | NB_MISC | GFX_MISC  | CPU_TRACE | MEM_FLOW | FCH_TRACE  | MAIN_FLOW| TEST_POINT | PSP_TRACE)
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdIdsDebugPrintFilter|0x100401030A300408|UINT64|0x00020005
+  ### @brief Switch for Serial port support of AGESA debug print
+  ### @details Switch for Serial port support of AGESA debug print, NOTE, AGESA will not init the serial port,
+  ### serial port should be initialized before call AGESA debug print.
+  ### @li TRUE:  Enable
+  ### @li FALSE: Disable
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdIdsDebugPrintSerialPortEnable|FALSE|BOOLEAN|0x00020009
+  ### @brief The serial port used for debug output can be either 2-wire (Rx/Tx) or 4-wire (adding DSR/CTS). Waiting for CTS on a
+  ### 2-wire port would cause a hang. This control is added to check the cable connection.
+  ### @brief Permitted Choices: (Type: Boolean)(Default: FALSE)
+  ### @li FALSE - Presume a 2-wire port and do not wait for CTS.
+  ### @li TRUE - Wait for both DSR and CTS to be set. DSR is set if a cable is connected. CTS is set if it is ok to transmit data.
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdIdsDebugPrintSerialPortDetectCableConnection|FALSE|BOOLEAN|0x0002000A
+
+  ### @brief Specify the IO port for serial out
+  ### @details ESPI or LPC COM1: 0x3F8, COM2: 0x2F8, COM3: 0x3E8, COM4: 0x2E8,
+  ### UART0: 0xFEDC9000, UART1: 0xFEDCA000, UART2: 0xFEDCE000, UART3: 0xFEDCF000, UART4: 0xFEDD1000.
+  ### @li If it's IO port: it must < 0x10000
+  ### @li If it's Memory: it must >= 0x10000
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdIdsDebugPrintSerialPort|0x3F8|UINT64|0x0002000B
+
+[PcdsDynamicEx]
+
+[PcdsFixedAtBuild, PcdsDynamic]
+  gEfiAmdAgesaPkgTokenSpaceGuid.PcdCfgPlatformPPT|0|UINT32|0x0004F111

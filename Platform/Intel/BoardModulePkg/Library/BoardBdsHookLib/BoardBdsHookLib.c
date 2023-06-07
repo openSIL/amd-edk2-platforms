@@ -14,14 +14,14 @@
 #include <Library/PciLib.h>
 #include <Library/UefiBootManagerLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
-
+#include <Library/IpmiBaseLib.h>
+#include <Library/IpmiCommandLib.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/UsbIo.h>
 #include <Protocol/PciEnumerationComplete.h>
+#include <IndustryStandard/Ipmi.h>
 
 #include "BoardBdsHook.h"
-
-#define IS_FIRST_BOOT_VAR_NAME L"IsFirstBoot"
 
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_BOOT_MODE    gBootMode;
 BOOLEAN                                        gPPRequireUIConfirm;
@@ -439,20 +439,21 @@ UpdateGopDevicePath (
   return Return;
 }
 
-
 /**
-  Get Graphics Controller Handle.
+  Get Graphics Controller Handle. VgaDevices needs to be freed by caller.
 
   @param NeedTrustedConsole    The flag to determine if trusted console
   or non trusted console should be returned
 
-  @retval NULL                  Console not found
-  @retval PciHandles            Successfully located
+  @retval EFI ERROR             No VGA capable devices found
+  @retval EFI_SUCCESS           At least one VGA device found
 **/
-EFI_HANDLE
+EFI_STATUS
 EFIAPI
 GetGraphicsController (
-  IN BOOLEAN    NeedTrustedConsole
+  IN BOOLEAN          NeedTrustedConsole,
+  IN OUT EFI_HANDLE   **VgaDevices,
+  IN OUT UINTN        *VgaDevicesCount
   )
 {
   EFI_STATUS                Status;
@@ -460,7 +461,13 @@ GetGraphicsController (
   EFI_HANDLE                *PciHandles;
   UINTN                     PciHandlesSize;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  UINT32                     NumDevices;
 
+  if (VgaDevicesCount == NULL || VgaDevices == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  NumDevices = 0;
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
                   &gEfiPciIoProtocolGuid,
@@ -469,7 +476,12 @@ GetGraphicsController (
                   &PciHandles
                   );
   if (EFI_ERROR (Status)) {
-    return NULL;
+    return Status;
+  }
+
+  *VgaDevices = AllocateZeroPool (sizeof (EFI_HANDLE) * PciHandlesSize);
+  if (VgaDevices == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   for (Index = 0; Index < PciHandlesSize; Index++) {
@@ -486,16 +498,22 @@ GetGraphicsController (
     }
     if ((NeedTrustedConsole && IsTrustedConsole (ConOut, DevicePath)) ||
         ((!NeedTrustedConsole) && (!IsTrustedConsole (ConOut, DevicePath)))) {
-      return PciHandles[Index];
+      VgaDevices[0][NumDevices] = PciHandles[Index];
+      NumDevices++;
     }
   }
-
-  return NULL;
+  *VgaDevicesCount = NumDevices;
+  if (NumDevices > 0) {
+    return EFI_SUCCESS;
+  }
+  else {
+    return EFI_NOT_FOUND;
+  }
 }
 
-
 /**
-  Updates Graphic ConOut variable.
+  Updates Graphic ConOut variable. This function searches for all VGA capable output devices and
+  adds them to the ConOut variable.
 
   @param NeedTrustedConsole    The flag that determines if trusted console
   or non trusted console should be returned
@@ -505,44 +523,66 @@ UpdateGraphicConOut (
   IN BOOLEAN    NeedTrustedConsole
   )
 {
-  EFI_HANDLE                          GraphicsControllerHandle;
   EFI_DEVICE_PATH_PROTOCOL            *GopDevicePath;
   EFI_DEVICE_PATH_PROTOCOL            *ConOutDevicePath;
   EFI_DEVICE_PATH_PROTOCOL            *UpdatedConOutDevicePath;
+  EFI_HANDLE                          *VgaDevices;
+  UINTN                               VgaDevicesCount;
+  UINTN                               Count;
+  EFI_STATUS                          Status;
+
+  Count = 0;
+  VgaDevicesCount = 0;
 
   //
   // Update ConOut variable
   //
-  GraphicsControllerHandle = GetGraphicsController (NeedTrustedConsole);
-  if (GraphicsControllerHandle != NULL) {
-    //
-    // Connect the GOP driver
-    //
-    gBS->ConnectController (GraphicsControllerHandle, NULL, NULL, TRUE);
-
-    //
-    // Get the GOP device path
-    // NOTE: We may get a device path that contains Controller node in it.
-    //
-    GopDevicePath = EfiBootManagerGetGopDevicePath (GraphicsControllerHandle);
-    if (GopDevicePath != NULL) {
-      GetEfiGlobalVariable2 (L"ConOut", (VOID **)&ConOutDevicePath, NULL);
-      UpdatedConOutDevicePath = UpdateGopDevicePath (ConOutDevicePath, GopDevicePath);
-      if (ConOutDevicePath != NULL) {
-        FreePool (ConOutDevicePath);
-      }
-      FreePool (GopDevicePath);
-      gRT->SetVariable (
-                      L"ConOut",
-                      &gEfiGlobalVariableGuid,
-                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                      GetDevicePathSize (UpdatedConOutDevicePath),
-                      UpdatedConOutDevicePath
-                      );
+  Status = GetGraphicsController (NeedTrustedConsole, &VgaDevices, &VgaDevicesCount);
+  if (Status == EFI_SUCCESS) {
+    GetEfiGlobalVariable2 (L"ConOut", (VOID **)&ConOutDevicePath, NULL);
+    if (ConOutDevicePath != NULL) {
+      DumpDevicePath (L"Original ConOut variable", ConOutDevicePath);
+      FreePool (ConOutDevicePath);
     }
+
+    //Add VGA devices to ConOut
+    for (Count = 0; Count < VgaDevicesCount; Count++) {
+      //
+      // Connect the GOP driver
+      //
+      gBS->ConnectController (VgaDevices[Count], NULL, NULL, TRUE);
+      //
+      // Get the GOP device path
+      // NOTE: We may get a device path that contains Controller node in it.
+      //
+      GopDevicePath = EfiBootManagerGetGopDevicePath (VgaDevices[Count]);
+      if (GopDevicePath != NULL) {
+        GetEfiGlobalVariable2 (L"ConOut", (VOID **)&ConOutDevicePath, NULL);
+        if (ConOutDevicePath != NULL) {
+          UpdatedConOutDevicePath = UpdateGopDevicePath (ConOutDevicePath, GopDevicePath);
+          if (UpdatedConOutDevicePath != NULL) {
+            gRT->SetVariable (
+                            L"ConOut",
+                            &gEfiGlobalVariableGuid,
+                            EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                            GetDevicePathSize (UpdatedConOutDevicePath),
+                            UpdatedConOutDevicePath
+                            );
+            FreePool (UpdatedConOutDevicePath);
+          }
+          FreePool (ConOutDevicePath);
+        }
+        FreePool (GopDevicePath);
+      }
+    }
+    FreePool (VgaDevices);
+  }
+  GetEfiGlobalVariable2 (L"ConOut", (VOID **)&ConOutDevicePath, NULL);
+  if (ConOutDevicePath != NULL) {
+    DumpDevicePath (L"Final ConOut variable", ConOutDevicePath);
+    FreePool (ConOutDevicePath);
   }
 }
-
 
 /**
   The function connects the trusted consoles.
@@ -1028,7 +1068,12 @@ ConnectRootBridge (
     gBS->ConnectController (RootBridgeHandleBuffer[RootBridgeIndex], NULL, NULL, Recursive);
   }
 }
+/**
+  Add console variable device paths
 
+  @param ConsoleType         ConIn or ConOut
+  @param ConsoleDevicePath   Device path to be added
+**/
 VOID
 AddConsoleVariable (
   IN CONSOLE_TYPE              ConsoleType,
@@ -1305,6 +1350,131 @@ BdsBeforeConsoleBeforeEndOfDxeGuidCallback (
 
 }
 
+/**
+   Handle possible IPMI boot overrides by modifying the LoadOptions variable.
+
+  @retval  EFI_SUCCESS    Boot override successful, or not necessary.
+  @retval  EFI_NOT_FOUND  Attempted to override boot to an unsupported boot option.
+**/
+EFI_STATUS
+HandleIpmiBootOverride (
+  )
+{
+  UINT8                                   Index;
+  UINT8                                   NvIpmiBootOverride;
+  UINT8                                   CurrentIpmiBootOverride;
+  UINT8                                   *GetBootOptionsBuffer;
+  UINT8                                   *SetBootOptionsBuffer;
+  UINTN                                   BootOptionCount;
+  UINTN                                   DataSize;
+  IPMI_GET_BOOT_OPTIONS_REQUEST           BootOptionsRequest;
+  IPMI_GET_BOOT_OPTIONS_RESPONSE          *BootOptionsResponse;
+  IPMI_BOOT_OPTIONS_RESPONSE_PARAMETER_5  *BootOptionsParameterData;
+  IPMI_SET_BOOT_OPTIONS_REQUEST           *SetBootOptionsRequest;
+  IPMI_SET_BOOT_OPTIONS_RESPONSE          SetBootOptionsResponse;
+  IPMI_BOOT_OPTIONS_RESPONSE_PARAMETER_5  *SetBootOptionsParameterData;
+  EFI_BOOT_MANAGER_LOAD_OPTION            *LoadOptionBiosSetup;
+  EFI_BOOT_MANAGER_LOAD_OPTION            *BootOptions;
+  EFI_STATUS                              Status;
+
+  ZeroMem (&BootOptionsRequest, sizeof (IPMI_GET_BOOT_OPTIONS_REQUEST));
+  ZeroMem (&SetBootOptionsResponse, sizeof (IPMI_SET_BOOT_OPTIONS_RESPONSE));
+
+  LoadOptionBiosSetup = NULL;
+  Status              = EFI_SUCCESS;
+
+  // setup buffers
+  GetBootOptionsBuffer = (UINT8 *)AllocateZeroPool (sizeof (BootOptionsResponse) + sizeof (IPMI_BOOT_OPTIONS_RESPONSE_PARAMETER_5));
+  SetBootOptionsBuffer = (UINT8 *)AllocateZeroPool (sizeof (SetBootOptionsRequest) + sizeof (IPMI_BOOT_OPTIONS_RESPONSE_PARAMETER_5));
+
+  // setup parameter dataa
+  BootOptionsRequest.ParameterSelector.Bits.ParameterSelector = IPMI_BOOT_OPTIONS_PARAMETER_BOOT_FLAGS;
+  BootOptionsResponse                                         = (IPMI_GET_BOOT_OPTIONS_RESPONSE *)&GetBootOptionsBuffer[0];
+  Status                                                      = IpmiGetSystemBootOptions (&BootOptionsRequest, BootOptionsResponse);
+  BootOptionsParameterData                                    = (IPMI_BOOT_OPTIONS_RESPONSE_PARAMETER_5 *)BootOptionsResponse->ParameterData;
+
+  if (EFI_ERROR (Status)) {
+    Status = EFI_UNSUPPORTED;
+    goto end;
+  }
+
+  // setup SetBootOptions parameter data
+  SetBootOptionsRequest       = (IPMI_SET_BOOT_OPTIONS_REQUEST *)&SetBootOptionsBuffer[0];
+  SetBootOptionsParameterData = (IPMI_BOOT_OPTIONS_RESPONSE_PARAMETER_5 *)SetBootOptionsRequest->ParameterData;
+
+  BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
+
+  // if received valid IPMI data, then override boot option
+  if (!BootOptionsResponse->ParameterValid.Bits.ParameterValid && BootOptionsParameterData->Data1.Bits.BootFlagValid) {
+    // get non volatile IpmiBootOverride variable
+    DataSize = sizeof (UINT8);
+    Status   = gRT->GetVariable (
+                      IPMI_BOOT_OVERRIDE_VAR_NAME,
+                      &gEfiCallerIdGuid,
+                      NULL,
+                      &DataSize,
+                      &NvIpmiBootOverride
+                      );
+    if (EFI_ERROR (Status)) {
+      NvIpmiBootOverride = IPMI_BOOT_DEVICE_SELECTOR_NO_OVERRIDE;
+    }
+
+    CurrentIpmiBootOverride = BootOptionsParameterData->Data2.Bits.BootDeviceSelector;
+
+    if (CurrentIpmiBootOverride == IPMI_BOOT_DEVICE_SELECTOR_BIOS_SETUP) {
+      DEBUG ((DEBUG_INFO, "[Bds]BiosSetup option override detected via IPMI\n"));
+      // need to find boot option corresponding to BiosSetup
+      for (Index = 0; Index < BootOptionCount; Index++) {
+        if ((StrCmp (BootOptions[Index].Description, L"Enter Setup") == 0) && (BootOptions[Index].Attributes == (LOAD_OPTION_CATEGORY_APP | LOAD_OPTION_ACTIVE | LOAD_OPTION_HIDDEN))) {
+          LoadOptionBiosSetup = &BootOptions[Index];
+        } else if (StrCmp (BootOptions[Index].Description, L"Enter Setup") == 0) {
+          // delete duplicate BiosSetup Menu option
+          EfiBootManagerDeleteLoadOptionVariable (BootOptions[Index].OptionNumber, LoadOptionTypeBoot);
+        }
+      }
+
+      if (LoadOptionBiosSetup == NULL) {
+        Status = EFI_UNSUPPORTED;
+        goto end;
+      }
+
+      // have Load option for bios setup, now update loadoptions
+      Status                           = EfiBootManagerDeleteLoadOptionVariable (LoadOptionBiosSetup->OptionNumber, LoadOptionTypeBoot);
+      LoadOptionBiosSetup->Attributes &= LOAD_OPTION_CATEGORY_BOOT;
+      LoadOptionBiosSetup->Attributes |= (LOAD_OPTION_ACTIVE | LOAD_OPTION_HIDDEN);
+      Status                           = EfiBootManagerAddLoadOptionVariable (LoadOptionBiosSetup, 0); // add back in loadoptions in 0th index (first option)
+
+      // if Ipmi override not persistent, reset boot option to None and persistent to true
+      if (!BootOptionsParameterData->Data1.Bits.PersistentOptions) {
+        SetBootOptionsRequest->ParameterValid.Bits.ParameterSelector = IPMI_BOOT_OPTIONS_PARAMETER_BOOT_FLAGS;
+        CopyMem (SetBootOptionsParameterData, BootOptionsParameterData, sizeof (IPMI_BOOT_OPTIONS_RESPONSE_PARAMETER_5));
+        SetBootOptionsParameterData->Data1.Bits.PersistentOptions  = 1;                                     // persistent
+        SetBootOptionsParameterData->Data2.Bits.BootDeviceSelector = IPMI_BOOT_DEVICE_SELECTOR_NO_OVERRIDE; // revert to no override
+        Status                                                     = IpmiSetSystemBootOptions (SetBootOptionsRequest, &SetBootOptionsResponse);
+      }
+    } else if ((CurrentIpmiBootOverride == IPMI_BOOT_DEVICE_SELECTOR_NO_OVERRIDE) && (CurrentIpmiBootOverride != NvIpmiBootOverride)) {
+      // delete BiosSetup option corresponding to the override
+      Status = EfiBootManagerDeleteLoadOptionVariable (BootOptions[0].OptionNumber, LoadOptionTypeBoot);
+      // re sort boot options
+      EfiBootManagerSortLoadOptionVariable (LoadOptionTypeBoot, CompareBootOption);
+    }
+
+    Status = gRT->SetVariable (
+                    IPMI_BOOT_OVERRIDE_VAR_NAME,
+                    &gEfiCallerIdGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof (UINT8),
+                    &CurrentIpmiBootOverride
+                    );
+  }
+
+end:
+  // Free buffers
+  FreePool (GetBootOptionsBuffer);
+  FreePool (SetBootOptionsBuffer);
+
+  return Status;
+}
 
 /**
   After console ready before boot option event callback
@@ -1401,6 +1571,7 @@ BdsAfterConsoleReadyBeforeBootOptionCallback (
 
       break;
   }
+  HandleIpmiBootOverride ();
 
   Print (L"Press F2 for Setup, or F7 for BootMenu!\n");
 

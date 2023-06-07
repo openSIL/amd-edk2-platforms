@@ -1,0 +1,41 @@
+## @file
+#
+#  AMD Generic Encapsulated Software Architecture (AGESA) Common Module Package DEC
+#  file.
+#  This file provides the minimum AMD SoC Mircoporcessor definitions for building
+#  AMD edk2 modules.
+#  
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  DEC_SPECIFICATION     = 0x00010005
+  PACKAGE_NAME          = AgesaCommonPkg
+  PACKAGE_GUID          = 6CBE6566-0D3F-4E35-8358-9602354E9F09
+  PACKAGE_VERSION       = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+
+[Guids]
+  gEfiAmdAgesaModulePkgTokenSpaceGuid      = {0x7788adf0, 0x9788, 0x4a3f, {0x83, 0xfa, 0xcb, 0x51, 0x2e, 0x7c, 0xf8, 0xdd}}
+  gAgesaConfigDbPointerVariableGuid        = {0x21229d24, 0xc71d, 0x4bc0, {0xb6, 0x3e, 0x67, 0x2f, 0x6d, 0xbf, 0x5f, 0xf7}}
+
+[Protocols]
+  ## Soc Protocols
+  gAmdSocLogicalIdProtocolGuid             = {0x72f8e409, 0x0d2a, 0x4b91, {0x88, 0x6f, 0xba, 0x13, 0x44, 0x9f, 0xd7, 0x78}}
+
+[Ppis]
+
+[PcdsFeatureFlag]
+
+[PcdsFixedAtBuild]
+
+[PcdsDynamic]
+  gEfiAmdAgesaModulePkgTokenSpaceGuid.PcdAmdS3LibTableSize|0x4000|UINT64|0x00027003
+
+[PcdsDynamicEx]

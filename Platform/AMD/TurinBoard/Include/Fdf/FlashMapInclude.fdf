@@ -1,0 +1,235 @@
+## @file
+#
+#  Copyright (C) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+##############################################################################
+#
+# Turin reference board - 2 SPI FLash devices accessible by x86 (selected by DIP-switch):
+# 1) 32MB Flash with 10-pin header next to the VGA connector.
+# 2) 64MB Flash with 10-pin header at 90-degrees from VGA connector, and also accessible by the BMC.
+#
+################################################################################
+
+################################################################################
+#
+# BIOS image layout
+#
+################################################################################
+###     Flash layout, 16MB and 32MB iamge size with ROM3_FLASH_ENABLE = FALSE
+################################################################################
+#       Start           End             Size            FV      Name
+################################################################################
+#       0x00000000      0x0001ffff      0x00020000      None    Unused
+#       0x00020000      0x00020fff      0x00001000      DATA    EFS
+#       0x00021000      0x0005efff      0x0003e000      DATA    NVRAM
+#       0x0005f000      0x0005ffff      0x00001000      DATA    NVRAM FTW
+#       0x00060000      0x000a0fff      0x00041000      None    NVRAM Reserved
+#       0x000a1000      0x006fffff      0x0065f000      None    NVRAM Reserved
+#       0x00121000      0x00349fff      0x00229000      None    PSP1
+#       0x0034a000      0x00385fff      0x0003c000      None    BIOS1
+#       0x00387000      0x005d7fff      0x00251000      None    PSP2
+#       0x005d8000      0x006f7fff      0x00120000      None    BIOS2
+#       0x00700000      0x007cbfff      0x000cc000      FV      FVADVANCED
+#       0x007cc000      0x0084bfff      0x00080000      FV      FVADVANCEDSECURITY
+#       0x0084c000      0x008ebfff      0x000a0000      FV      FVOSBOOT
+#       0x008ec000      0x00bbbfff      0x002d0000      FV      FVUEFIBOOT
+#       0x00bbc000      0x00be3fff      0x00028000      FV      FVSECURITY
+#       0x00be4000      0x00bf7fff      0x00014000      FV      FVPOSTMEMORY
+#       0x00bf8000      0x00bfffff      0x00008000      FV      FVADVANCEDPREMEMORY
+#       0x00c00000      0x00ffffff      0x00400000      FV      FVPREMEMORY
+################################################################################
+#       Extra padding for 32MB image size
+#       0x01000000      0x01ffffff      0x01000000      None    unused
+################################################################################
+###     Flash layout, 32MB with ROM3_FLASH_ENABLE = TRUE
+################################################################################
+#       Start           End             Size            FV      Name
+################################################################################
+#       0x00000000      0x0001ffff      0x00020000      None    Unused
+#       0x00020000      0x00020fff      0x00001000      DATA    EFS
+#       0x00021000      0x0005efff      0x0003e000      DATA    NVRAM
+#       0x0005f000      0x0005ffff      0x00001000      DATA    NVRAM FTW
+#       0x00060000      0x000a0fff      0x00041000      None    NVRAM Reserved
+#       0x000a1000      0x006fffff      0x0065f000      None    NVRAM Reserved
+#       0x00121000      0x00349fff      0x00229000      None    PSP1
+#       0x0034a000      0x00385fff      0x0003c000      None    BIOS1
+#       0x00387000      0x005d7fff      0x00251000      None    PSP2
+#       0x005d8000      0x006f7fff      0x00120000      None    BIOS2
+#       0x00bb0000      0x00bd7fff      0x00028000      FV      FVSECURITY
+#       0x00bd8000      0x00bf7fff      0x00020000      FV      FVPOSTMEMORY
+#       0x00bf8000      0x00bfffff      0x00008000      FV      FVADVANCEDPREMEMORY
+#       0x00c00000      0x00ffffff      0x00400000      FV      FVPREMEMORY
+#       0x01000000      0x010cbfff      0x000cc000      FV      FVADVANCED
+#       0x010cc000      0x0114bfff      0x00080000      FV      FVADVANCEDSECURITY
+#       0x0114c000      0x011ebfff      0x000a0000      FV      FVOSBOOT
+#       0x011ec000      0x014bbfff      0x002d0000      FV      FVUEFIBOOT
+#       0x014bc000      0x01ffefff      0x00b43000      None    Unused
+#       0x01fff000      0x01ffffff      0x00001000      None    Unused
+################################################################################
+
+    DEFINE ROM2_FLASH_BASE        = 0xFF000000
+    DEFINE ROM2_FLASH_SIZE        = 0x01000000
+    DEFINE ROM3_FLASH_SIZE        = 0x02000000
+    DEFINE SPI_BLOCK_SIZE         = 0x1000
+
+  !ifndef BUILD_16MB_IMAGE
+    DEFINE BUILD_16MB_IMAGE       = FALSE
+  !endif
+  !ifndef ROM3_FLASH_ENABLE
+    DEFINE ROM3_FLASH_ENABLE      = FALSE
+  !endif
+  !ifndef ROM3_FLASH_BASE
+    DEFINE ROM3_FLASH_BASE        = 0xFD00000000
+  !endif
+
+  !if $(BUILD_16MB_IMAGE) == TRUE
+    DEFINE SPI_NUM_BLOCKS         = 0x1000
+  !else
+    DEFINE SPI_NUM_BLOCKS         = 0x2000
+  !endif
+  !if ($(ROM3_FLASH_ENABLE) == TRUE) && ($(BUILD_16MB_IMAGE) == TRUE)
+    !error "ROM3 cannot be enabled on 16MB image"
+  !endif
+
+  !ifndef FV_PRE_MEMORY_SIZE
+    # Do not reduce the FvPreMemorySize
+    DEFINE FV_PRE_MEMORY_SIZE           = 0x00400000
+  !endif
+  !ifndef FV_ADVANCED_PRE_MEMORY_SIZE
+    DEFINE FV_ADVANCED_PRE_MEMORY_SIZE  = 0x00008000
+  !endif
+  !ifndef FV_POST_MEMORY_SIZE
+    !if ($(ROM3_FLASH_ENABLE) == TRUE)
+      # Need extra space for DxeMain
+      DEFINE FV_POST_MEMORY_SIZE        = 0x00020000
+    !else
+      DEFINE FV_POST_MEMORY_SIZE        = 0x00014000
+    !endif
+  !endif
+  !ifndef FV_SECURITY_SIZE
+    DEFINE FV_SECURITY_SIZE             = 0x00028000
+  !endif
+  !ifndef FV_UEFI_BOOT_SIZE
+    DEFINE FV_UEFI_BOOT_SIZE            = 0x002D0000
+  !endif
+  !ifndef FV_OS_BOOT_SIZE
+    DEFINE FV_OS_BOOT_SIZE              = 0x000A0000
+  !endif
+  !ifndef FV_ADVANCED_SECURITY_SIZE
+    DEFINE FV_ADVANCED_SECURITY_SIZE    = 0x00080000
+  !endif
+  !ifndef FV_ADVANCED_SIZE
+    DEFINE FV_ADVANCED_SIZE             = 0x000CC000
+  !endif
+
+    DEFINE FV_FW_SIG_OFFSET       = 0x00020000
+    DEFINE FV_FW_SIG_SIZE         = 0x00001000
+
+    DEFINE NVRAM_AREA_VAR_OFFSET  = 0x00021000
+    DEFINE NVRAM_AREA_VAR_SIZE    = 0x0003E000
+    DEFINE NVRAM_AREA_SIZE        = 0x00080000
+
+    DEFINE FTW_WORKING_OFFSET     = $(NVRAM_AREA_VAR_OFFSET) + $(NVRAM_AREA_VAR_SIZE)
+    DEFINE FTW_WORKING_SIZE       = $(SPI_BLOCK_SIZE)
+
+    DEFINE FTW_SPARE_OFFSET       = $(FTW_WORKING_OFFSET) + $(FTW_WORKING_SIZE)
+    DEFINE FTW_SPARE_SIZE         = $(NVRAM_AREA_SIZE) - $(NVRAM_AREA_VAR_SIZE) - $(FTW_WORKING_SIZE)
+# NOTE:
+#
+# BOOT_FV_BASE value should match with the PspData<SoC>.xml ResetImage address
+# e.g.
+#     <POINT_ENTRY Type="0x62" Address="0xC00000" Destination="0x76C00000" Size="0x400000">
+#      <TypeAttrib Compressed="0x0" Copy="0x1" ReadOnly="0x0" RegionType="0x0" ResetImage="0x1" />
+#    </POINT_ENTRY>
+#
+# Also note that C00000 from 0x76C000000 came from PcdFlashFvPreMemoryOffset
+# if PcdFlashFvPreMemoryOffset gets changed then the below value should also
+# need to be change.
+#
+!ifndef BOOT_FV_BASE
+    DEFINE BOOT_FV_BASE           = 0x76C00000
+!endif
+
+SET gEfiAmdAgesaPkgTokenSpaceGuid.PcdAgesaFlashNvStorageBlockSize   = $(SPI_BLOCK_SIZE)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashAreaBaseAddress           = 0xFF000000
+SET gEfiAmdAgesaPkgTokenSpaceGuid.PcdAgesaFlashAreaBaseAddress      = gMinPlatformPkgTokenSpaceGuid.PcdFlashAreaBaseAddress
+
+# SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageOffset           = 0x00000000
+# SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageSize             = 0x00040000
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageVariableOffset   = $(NVRAM_AREA_VAR_OFFSET)
+SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize    = $(NVRAM_AREA_VAR_SIZE)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingOffset = $(FTW_WORKING_OFFSET)
+SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize  = $(FTW_WORKING_SIZE)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareOffset   = $(FTW_SPARE_OFFSET)
+SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize    = $(FTW_SPARE_SIZE)
+
+#
+# FV offset and size assignment
+#
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemorySize               = $(FV_PRE_MEMORY_SIZE)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemoryOffset             = ($(ROM2_FLASH_SIZE) - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemorySize)
+
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedPreMemorySize       = $(FV_ADVANCED_PRE_MEMORY_SIZE)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedPreMemoryOffset     = (gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemoryOffset - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedPreMemorySize)
+
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemorySize              = $(FV_POST_MEMORY_SIZE)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemoryOffset            = (gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedPreMemoryOffset - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemorySize)
+
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecuritySize                = $(FV_SECURITY_SIZE)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecurityOffset              = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemoryOffset - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecuritySize
+
+!if $(ROM3_FLASH_ENABLE) == FALSE
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootSize              = $(FV_UEFI_BOOT_SIZE)
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootOffset            = (gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecurityOffset - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootSize)
+
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize                = $(FV_OS_BOOT_SIZE)
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootOffset              = (gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootOffset - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize)
+
+  SET gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecuritySize   = $(FV_ADVANCED_SECURITY_SIZE)
+  SET gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecurityOffset = (gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootOffset - gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecuritySize)
+
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedSize              = $(FV_ADVANCED_SIZE)
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedOffset            = (gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecurityOffset - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedSize)
+  # NOTE:
+  # for ROM3_FLASH_ENABLE disabled BIOS image max address (PcdFlashFvAdvancedSize + PcdFlashFvAdvancedOffset)
+  # should not overlap with BIOS DIR2 offset + size in PspData<SoC>.xml
+  # e.g
+  #   <BIOS_DIR Level="2" Base="0x5CB000" Size="0x120000" SpiBlockSize=" 0x1000">
+  #
+!endif
+
+!if $(ROM3_FLASH_ENABLE) == TRUE
+  # if ROM3 is enabled then continue the offset update
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedOffset            = $(ROM2_FLASH_SIZE)
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedSize              = $(FV_ADVANCED_SIZE)
+
+  SET gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecurityOffset = (gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedOffset + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedSize)
+  SET gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecuritySize   = $(FV_ADVANCED_SECURITY_SIZE)
+
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootOffset              = (gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecurityOffset + gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecuritySize)
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize                = $(FV_OS_BOOT_SIZE)
+
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootOffset            = (gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootOffset + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize)
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootSize              = $(FV_UEFI_BOOT_SIZE)
+  # NOTE:
+  # for ROM3_FLASH_ENABLE enabled BIOS image max address (PcdFlashFvSecuritySize + PcdFlashFvSecurityOffset)
+  # should not overlap with BIOS DIR2 offset + size in PspData<SoC>.xml
+  # e.g
+  #   <BIOS_DIR Level="2" Base="0x5CB000" Size="0x120000" SpiBlockSize=" 0x1000">
+!endif
+
+SET gAmdMinBoardPkgTokenSpaceGuid.PcdBootFvBase = $(BOOT_FV_BASE)
+
+!if $(ROM3_FLASH_ENABLE) == TRUE
+  SET gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedBase           = $(ROM3_FLASH_BASE)
+  SET gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecurityBase   = (gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedBase + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedSize)
+  SET gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvOsBootBase             = (gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecurityBase + gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvAdvancedSecuritySize)
+  SET gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvUefiBootBase           = (gAmdMinBoardPkgTokenSpaceGuid.PcdAmdFlashFvOsBootBase + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize)
+!endif
+
+

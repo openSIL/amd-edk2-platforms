@@ -1,0 +1,51 @@
+## @file
+#
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AmdApcbDxeV3
+  FILE_GUID                      = 4D3708A0-6D9B-47D3-AD87-E80C781BC0A7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = AmdApcbV3DxeDriverEntry
+
+[Packages]
+  MdePkg/MdePkg.dec
+  AgesaPkg/AgesaPkg.dec
+  AgesaModulePkg/AgesaCommonModulePkg.dec
+  AgesaModulePkg/AgesaModulePspPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  DxeServicesTableLib
+  MemoryAllocationLib
+  ApcbLibV3
+
+[Sources]
+  ApcbV3Dxe.c
+
+[Guids]
+
+[Protocols]
+  gEfiDxeSmmReadyToLockProtocolGuid
+  gEfiSmmCommunicationProtocolGuid
+
+
+[Pcd]
+
+[Depex]
+  TRUE
+
+
+

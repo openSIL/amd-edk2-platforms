@@ -1,0 +1,20 @@
+## @file
+#
+#  CRB specific - Internal AGESA PEI build.
+#  
+#  Copyright (C) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+  #
+  # AMD AGESA PEI Includes - Internal
+  #
+  # OPENSIL_OVERRIDE STARTS
+!if $(OPENSILSUPPORT) == TRUE
+  !include AgesaRedirects/AgesaSp5BrhModulePkg.pei.inc.fdf
+  !include AmdOpenSilPkg/opensil-uefi-interface/AmdOpenSilPkgBrh.pei.inc.fdf
+!else
+  !include AgesaModulePkg/AgesaSp5BrhModulePkg.pei.inc.fdf
+!endif
+  # OPENSIL_OVERRIDE ENDS

@@ -1,0 +1,30 @@
+## @file
+#
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION     = 0x00010005
+  PACKAGE_NAME          = AgesaDfPkg
+  PACKAGE_GUID          = 81e51ee3-c347-4563-92fe-790ba953bf0f
+  PACKAGE_VERSION       = 0.1
+
+[Includes]
+
+[LibraryClasses]
+
+[Guids]
+
+[Protocols]
+  gAmdFabricNumaServices2ProtocolGuid      = {0xa8ff2e64, 0xf319, 0x4af1, {0x9e, 0xc8, 0x18, 0x89, 0x89, 0xc3, 0x1e, 0x4a}}
+
+[Ppis]
+
+[PcdsFeatureFlag]
+
+[PcdsFixedAtBuild]
+
+[PcdsDynamic]

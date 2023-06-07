@@ -1,0 +1,34 @@
+## @file
+#
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION     = 0x00010005
+  PACKAGE_NAME          = AgesaPspPkg
+  PACKAGE_GUID          = 5c48f900-a98c-431f-8be5-19c09c65bb05
+  PACKAGE_VERSION       = 0.1
+
+[Includes]
+
+[LibraryClasses]
+
+
+[Guids]
+
+[Protocols]
+
+[Ppis]
+
+[PcdsFeatureFlag]
+
+
+[PcdsFixedAtBuild]
+
+
+[PcdsDynamic]
+
+[PcdsFixedAtBuild, PcdsDynamic]

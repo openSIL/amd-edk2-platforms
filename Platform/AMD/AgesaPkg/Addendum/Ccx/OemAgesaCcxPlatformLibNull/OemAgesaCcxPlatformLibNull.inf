@@ -1,0 +1,38 @@
+## @file
+#
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = OemAgesaCcxPlatformLibNull
+  FILE_GUID                      = B1F58B07-0146-4804-B701-A56CB5716529
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = OemAgesaCcxPlatformLib
+
+[Sources.common]
+  OemAgesaCcxPlatformLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+
+[Guids]
+
+[Protocols]
+
+[Ppis]
+
+[Pcd]
+
+[Depex]
+  TRUE
+
+[BuildOptions]
+
+

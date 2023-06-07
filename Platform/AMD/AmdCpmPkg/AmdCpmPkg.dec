@@ -1,0 +1,37 @@
+## @file
+#
+#  AMD Common Platform Module (CPM) Module Package DEC
+#  file.
+#  
+#  Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION     = 0x00010005
+  PACKAGE_NAME          = CpmPkg
+  PACKAGE_GUID          = ABE128BA-1061-4A53-A1B8-D07329AA7A67
+  PACKAGE_VERSION       = 0.1
+
+[Includes]
+  Include
+  Library
+
+[LibraryClasses]
+[Guids]
+
+  gShellActHiiGuid                = {0x340EBE97, 0x3C1C, 0x4272, {0x9C, 0xCE, 0xC1, 0xFF, 0x86, 0x6F, 0x73, 0x3C}}
+[Protocols]
+  gAmdCpmTableProtocolGuid = { 0x3724cf01, 0x00c2, 0x9762, {0x11, 0xb3, 0x0e, 0xa8, 0xaa, 0x89, 0x72, 0x00 }}
+
+[PcdsFixedAtBuild]
+  gAmdCpmPkgTokenSpaceGuid.PcdFchUartPort|2|UINT8|0x00000052
+
+  #ACPI
+  gAmdCpmPkgTokenSpaceGuid.PcdAmdAcpiHestTableHeaderOemTableId|"AMD HEST"|VOID*|0x000AC001
+  gAmdCpmPkgTokenSpaceGuid.PcdAmdAcpiBertTableHeaderOemTableId|"AMD BERT"|VOID*|0x000AC002
+  gAmdCpmPkgTokenSpaceGuid.PcdAmdAcpiEinjTableHeaderOemTableId|"AMD EINJ"|VOID*|0x000AC003
+
+  gAmdCpmPkgTokenSpaceGuid.UsePciXAslName|FALSE|BOOLEAN|0x12000003

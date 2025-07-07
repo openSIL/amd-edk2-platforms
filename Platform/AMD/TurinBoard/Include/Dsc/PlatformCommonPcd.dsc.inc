@@ -61,9 +61,6 @@
   # Stage 6 - boot with advanced features enabled
   #
   gMinPlatformPkgTokenSpaceGuid.PcdBootStage|6
-  gAmdCpmPkgTokenSpaceGuid.PcdAmdAcpiBertTableHeaderOemTableId|$(PLATFORM_CRB_TABLE_ID)
-  gAmdCpmPkgTokenSpaceGuid.PcdAmdAcpiHestTableHeaderOemTableId|$(PLATFORM_CRB_TABLE_ID)
-  gAmdCpmPkgTokenSpaceGuid.PcdAmdAcpiEinjTableHeaderOemTableId|$(PLATFORM_CRB_TABLE_ID)
 
   # Set ROM Armor Selection
   gEfiAmdAgesaPkgTokenSpaceGuid.PcdAmdPspRomArmorSelection|1

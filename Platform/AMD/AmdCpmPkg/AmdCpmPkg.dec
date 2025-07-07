@@ -29,9 +29,4 @@
 [PcdsFixedAtBuild]
   gAmdCpmPkgTokenSpaceGuid.PcdFchUartPort|2|UINT8|0x00000052
 
-  #ACPI
-  gAmdCpmPkgTokenSpaceGuid.PcdAmdAcpiHestTableHeaderOemTableId|"AMD HEST"|VOID*|0x000AC001
-  gAmdCpmPkgTokenSpaceGuid.PcdAmdAcpiBertTableHeaderOemTableId|"AMD BERT"|VOID*|0x000AC002
-  gAmdCpmPkgTokenSpaceGuid.PcdAmdAcpiEinjTableHeaderOemTableId|"AMD EINJ"|VOID*|0x000AC003
-
   gAmdCpmPkgTokenSpaceGuid.UsePciXAslName|FALSE|BOOLEAN|0x12000003
